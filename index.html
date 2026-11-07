@@ -283,7 +283,6 @@ const WE = [
  {t:"Hospice volunteering",type:"In person",cost:"Free",d:"Hospices welcome volunteers in many roles. Great for showing empathy and understanding of palliative care. Contact your local hospice.",l:"https://www.hospiceuk.org"},
  {t:"Care home volunteering",type:"In person",cost:"Free",d:"Visit and support residents with activities and conversation. Contact local care homes directly. Often counts strongly for empathy.",l:"https://www.nhs.uk/conditions/social-care-and-support-guide/"},
  {t:"GP surgery or pharmacy shadowing",type:"In person",cost:"Free",d:"Ask local surgeries, pharmacies, dentists and opticians directly with a polite email or visit. Availability varies and many only accept short observation days.",l:"https://www.nhs.uk/service-search/find-a-gp"},
- {t:"Sutton Trust Pathways to Medicine",type:"In person",cost:"Free",d:"Programme for eligible state school students, with support, university experiences and work experience. Check eligibility and application windows.",l:"https://www.suttontrust.com/our-work/pathways-to-professions/"},
  {t:"Medical school outreach and widening participation events",type:"In person",cost:"Free",d:"Many medical schools run open days, taster days and summer schools for Year 12 students. Search the outreach page of each medical school you are interested in.",l:"https://www.medschools.ac.uk"},
  {t:"Medical Schools Council guidance",type:"Online",cost:"Free",d:"Official advice about what medical schools expect from work experience and how to reflect on it.",l:"https://www.medschools.ac.uk"},
  {t:"FutureLearn healthcare courses",type:"Online",cost:"Free",d:"Free short online courses from universities on topics like healthcare, anatomy and medical ethics. Useful for your personal statement and interviews.",l:"https://www.futurelearn.com"},
@@ -423,34 +422,18 @@ renderWE();
 
 /* ============================================================
    7. PUBLIC CHAT
-   GitHub Pages can't store messages by itself, so this uses
-   Firebase Realtime Database (free). Until you paste your
-   Firebase details below, the chat runs in "demo mode" where
-   messages are only saved in your own browser.
-
-   SETUP (5 minutes):
-   1. Go to https://console.firebase.google.com and create a project.
-   2. Build > Realtime Database > Create database.
-   3. Project settings > Your apps > Web (</>) and copy the config.
-   4. Paste it into FIREBASE_CONFIG below.
-   5. In Realtime Database > Rules, use rules that allow reading and
-      adding messages only, for example:
-      { "rules": { "messages": { ".read": true,
-        "$id": { ".write": "!data.exists()",
-        ".validate": "newData.child('text').isString() && newData.child('text').val().length <= 300" } } } }
+   Messages are stored in Netlify Database via the /api/chat
+   function (see netlify/functions/chat.ts). New messages are
+   fetched every few seconds so everyone sees the same chat.
    ============================================================ */
-const FIREBASE_CONFIG = {
-  apiKey: "",
-  authDomain: "",
-  databaseURL: "",
-  projectId: "",
-  appId: ""
-};
-
 const chatBox=document.getElementById('chatBox');
 const chatNotice=document.getElementById('chatNotice');
-const useFirebase = !!FIREBASE_CONFIG.databaseURL;
-let db=null;
+const chatForm=document.getElementById('chatForm');
+const chatBtn=chatForm.querySelector('button[type=submit]');
+const API='/api/chat';
+const seen=new Set();
+let lastId=0, polling=false;
+const reported=new Set(JSON.parse(localStorage.getItem('medatlas_reported')||'[]'));
 
 const BLOCK = [/[\w.+-]+@[\w-]+\.[\w.]+/i, /(\+?\d[\s-]?){9,}/, /\b(instagram|snapchat|tiktok|whatsapp|discord)\b/i];
 const BAD = ['fuck','shit','cunt','bitch','nigg','faggot','retard'];
@@ -463,60 +446,76 @@ function clean(text){
 function linkify(text){
   return esc(text).replace(/(https?:\/\/[^\s<]+)/g,u=>`<a href="${u}" target="_blank" rel="noopener noreferrer nofollow">${u}</a>`);
 }
-function addMsg(m,key){
+function setNotice(html,isError){
+  chatNotice.innerHTML=html;
+  chatNotice.style.borderColor=isError?'#d9534f':'';
+}
+function addMsg(m){
+  if(seen.has(m.id)) return;
+  seen.add(m.id); lastId=Math.max(lastId,m.id);
+  const nearBottom=chatBox.scrollHeight-chatBox.scrollTop-chatBox.clientHeight<60;
+  const empty=chatBox.querySelector('.empty'); if(empty) empty.remove();
   const d=document.createElement('div'); d.className='msg';
   const t=new Date(m.time||Date.now());
+  const isRep=reported.has(m.id);
   d.innerHTML=`<b>${esc(m.name)}</b><time>${t.toLocaleString([], {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</time>
-    <button type="button">report</button><br>${linkify(m.text)}`;
-  d.querySelector('button').addEventListener('click',e=>{
-    e.target.textContent='reported'; e.target.disabled=true;
-    if(db && key) db.ref('reports/'+key).set(true);
+    <button type="button"${isRep?' disabled':''}>${isRep?'reported':'report'}</button><br>${linkify(m.text)}`;
+  d.querySelector('button').addEventListener('click',async e=>{
+    const b=e.target; b.disabled=true; b.textContent='reported';
+    reported.add(m.id); localStorage.setItem('medatlas_reported',JSON.stringify([...reported].slice(-200)));
+    try{ await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'report',id:m.id})}); }catch(_){}
   });
   chatBox.appendChild(d);
-  chatBox.scrollTop=chatBox.scrollHeight;
+  if(nearBottom) chatBox.scrollTop=chatBox.scrollHeight;
 }
-
-if(useFirebase){
-  chatNotice.textContent='Live chat. Messages are public and visible to everyone using the site.';
-  const s1=document.createElement('script');
-  s1.src='https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js';
-  s1.onload=()=>{
-    const s2=document.createElement('script');
-    s2.src='https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js';
-    s2.onload=()=>{
-      firebase.initializeApp(FIREBASE_CONFIG);
-      db=firebase.database();
-      db.ref('messages').limitToLast(100).on('child_added',snap=>addMsg(snap.val(),snap.key));
-    };
-    document.head.appendChild(s2);
-  };
-  document.head.appendChild(s1);
-}else{
-  chatNotice.innerHTML='<b>Demo mode:</b> the chat isn\'t connected to a shared database yet, so messages are only saved in your own browser. See the setup steps in the code (section 7) to make it a real public chat.';
-  JSON.parse(localStorage.getItem('medatlas_chat')||'[]').forEach(m=>addMsg(m));
+async function loadMessages(){
+  if(polling) return; polling=true;
+  try{
+    const r=await fetch(API+(lastId?`?after=${lastId}`:''),{cache:'no-store'});
+    if(!r.ok) throw new Error(r.status);
+    const {messages}=await r.json();
+    const first=!lastId && !seen.size;
+    messages.forEach(addMsg);
+    if(first){
+      if(!messages.length) chatBox.innerHTML='<p class="small empty" style="margin:auto">No messages yet. Be the first to say hello!</p>';
+      chatBox.scrollTop=chatBox.scrollHeight;
+    }
+    setNotice('Live chat. Messages are public and visible to everyone using the site.');
+  }catch(e){
+    setNotice('<b>Can\'t reach the chat right now.</b> Retrying automatically...',true);
+  }finally{ polling=false; }
 }
+loadMessages();
+setInterval(()=>{ if(!document.hidden) loadMessages(); },4000);
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) loadMessages(); });
 
 const savedName=localStorage.getItem('medatlas_name');
 if(savedName) document.getElementById('chatName').value=savedName;
 let lastSent=0;
-document.getElementById('chatForm').addEventListener('submit',e=>{
+chatForm.addEventListener('submit',async e=>{
   e.preventDefault();
   const name=document.getElementById('chatName').value.trim().slice(0,20);
-  const text=document.getElementById('chatText').value.trim().slice(0,300);
+  const textEl=document.getElementById('chatText');
+  const text=textEl.value.trim().slice(0,300);
   if(!name||!text) return;
   if(Date.now()-lastSent<3000){alert('Please wait a few seconds between messages.');return;}
   const problem=clean(name+' '+text);
   if(problem){alert(problem);return;}
-  lastSent=Date.now();
   localStorage.setItem('medatlas_name',name);
-  const m={name,text,time:Date.now()};
-  if(useFirebase && db){ db.ref('messages').push(m); }
-  else{
-    addMsg(m);
-    const arr=JSON.parse(localStorage.getItem('medatlas_chat')||'[]'); arr.push(m);
-    localStorage.setItem('medatlas_chat',JSON.stringify(arr.slice(-100)));
+  chatBtn.disabled=true; chatBtn.textContent='Sending...';
+  try{
+    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,text})});
+    const data=await r.json().catch(()=>({}));
+    if(!r.ok){ alert(data.error||'Your message couldn\'t be sent. Please try again.'); return; }
+    lastSent=Date.now();
+    textEl.value='';
+    addMsg(data.message);
+    chatBox.scrollTop=chatBox.scrollHeight;
+  }catch(_){
+    alert('Your message couldn\'t be sent. Check your connection and try again.');
+  }finally{
+    chatBtn.disabled=false; chatBtn.textContent='Send';
   }
-  document.getElementById('chatText').value='';
 });
 </script>
 </body>
