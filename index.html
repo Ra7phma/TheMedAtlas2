@@ -1,1 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Med Atlas | UK Medicine Application Guide</title>
+<meta name="description" content="UCAT calculator, UK medical school requirements, cut-offs and work experience for Year 12 and 13 students.">
+<style>
+:root{
+  --bg:#f5f8f9; --card:#ffffff; --ink:#14232b; --muted:#5b6c75; --line:#dde5e9;
+  --brand:#0f766e; --brand-dark:#0b5a54; --accent:#e0f2f1;
+  --green:#16a34a; --amber:#f59e0b; --red:#dc2626;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+a{color:var(--brand)}
+header.nav{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--line)}
+.nav-inner{max-width:1100px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.logo{font-weight:800;font-size:1.25rem;color:var(--brand);text-decoration:none;letter-spacing:-.3px}
+.logo span{color:var(--ink)}
+nav a{margin-left:16px;text-decoration:none;color:var(--ink);font-weight:600;font-size:.92rem}
+nav a:hover{color:var(--brand)}
+.hero{background:linear-gradient(135deg,#0f766e,#134e4a);color:#fff;padding:64px 20px 56px;text-align:center}
+.hero h1{margin:0 0 12px;font-size:clamp(2rem,5vw,3.2rem);letter-spacing:-1px}
+.hero p{max-width:640px;margin:0 auto 24px;font-size:1.1rem;opacity:.92}
+.btn{display:inline-block;background:#fff;color:var(--brand-dark);padding:11px 22px;border-radius:999px;font-weight:700;text-decoration:none;border:0;cursor:pointer;font-size:1rem;margin:4px}
+.btn.solid{background:var(--brand);color:#fff}
+.btn.solid:hover{background:var(--brand-dark)}
+section{max-width:1100px;margin:0 auto;padding:48px 20px}
+section h2{font-size:1.8rem;margin:0 0 6px;letter-spacing:-.5px}
+section .sub{color:var(--muted);margin:0 0 24px;max-width:760px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.notice{background:#fffbeb;border:1px solid #fde68a;color:#78560a;padding:12px 16px;border-radius:10px;font-size:.9rem;margin-bottom:20px}
+.notice.info{background:#ecfeff;border-color:#a5f3fc;color:#155e75}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+input[type=text],input[type=number],select,textarea{padding:10px 12px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff;color:var(--ink)}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--brand);outline-offset:1px}
+label.chk{display:flex;gap:6px;align-items:center;font-size:.92rem}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:#fff}
+table{border-collapse:collapse;width:100%;min-width:1000px;font-size:.88rem}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--accent);font-size:.78rem;text-transform:uppercase;letter-spacing:.4px;color:var(--brand-dark)}
+tr:last-child td{border-bottom:0}
+.tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.75rem;font-weight:700;background:var(--accent);color:var(--brand-dark)}
+.tag.no{background:#fee2e2;color:#991b1b}
+.tag.chk{background:#fef3c7;color:#92400e}
+.num{font-weight:700;font-size:1rem}
+.mini{display:block;font-size:.72rem;color:var(--muted);font-weight:400}
+/* Leaderboard */
+.score-box{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+.score-box input[type=range]{flex:1;min-width:200px;accent-color:var(--brand)}
+.score-box input[type=number]{width:110px;font-size:1.1rem;font-weight:700}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.85rem;color:var(--muted);margin-bottom:14px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.board{display:flex;flex-direction:column;gap:6px}
+.row{display:grid;grid-template-columns:28px 170px 1fr 70px;gap:10px;align-items:center;font-size:.88rem}
+.rank{color:var(--muted);font-weight:700;text-align:right}
+.name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track{position:relative;height:22px;background:#eef3f5;border-radius:6px}
+.bar{height:100%;border-radius:6px;transition:width .4s,background .3s}
+.comp{position:absolute;top:-3px;bottom:-3px;width:3px;background:#14232b;border-radius:2px}
+.me{position:absolute;top:-6px;bottom:-6px;width:2px;background:var(--brand);}
+.val{font-weight:700;text-align:right}
+@media(max-width:640px){.row{grid-template-columns:22px 110px 1fr 52px;font-size:.8rem}}
+/* Calculator */
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.field label{font-weight:600;font-size:.9rem}
+.result{background:var(--accent);border-radius:12px;padding:16px;margin-top:8px}
+.result .big{font-size:2.2rem;font-weight:800;color:var(--brand-dark);line-height:1.1}
+.small{font-size:.85rem;color:var(--muted)}
+/* Work experience */
+.wegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.we h3{margin:6px 0;font-size:1.05rem}
+.we p{margin:6px 0;font-size:.92rem}
+/* Chat */
+.chatbox{height:380px;overflow-y:auto;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.msg{background:#f1f6f7;border-radius:10px;padding:8px 12px;max-width:90%;word-wrap:break-word;overflow-wrap:anywhere}
+.msg b{color:var(--brand-dark)}
+.msg time{font-size:.72rem;color:var(--muted);margin-left:6px}
+.msg a{word-break:break-all}
+.msg button{background:none;border:0;color:var(--muted);cursor:pointer;font-size:.72rem;margin-left:8px;text-decoration:underline}
+.chatform{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.chatform input[type=text]{flex:1;min-width:140px}
+footer{background:#14232b;color:#c5d2d8;padding:32px 20px;text-align:center;font-size:.88rem}
+footer p{max-width:760px;margin:6px auto}
+</style>
+</head>
+<body>
 
+<header class="nav">
+  <div class="nav-inner">
+    <a class="logo" href="#top">The Med <span>Atlas</span></a>
+    <nav>
+      <a href="#unis">Universities</a>
+      <a href="#leaderboard">Leaderboard</a>
+      <a href="#calculator">UCAT Calculator</a>
+      <a href="#experience">Work Experience</a>
+      <a href="#chat">Community</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero" id="top">
+  <h1>Your map to medical school.</h1>
+  <p>Built for Year 12 and 13 students applying to medicine in the UK. Compare 36 medical schools, check where your UCAT score gets you, and find work experience.</p>
+  <a class="btn" href="#leaderboard">See where my UCAT can get me</a>
+  <a class="btn" href="#experience">Find work experience</a>
+</div>
+
+<section id="unis">
+  <h2>Medical school requirements</h2>
+  <p class="sub">How each university uses the UCAT, the Situational Judgement Test (SJT), GCSEs and A-levels, plus the lowest UCAT score invited to interview at each school last year (2026 entry).</p>
+  <div class="notice info"><b>New UCAT format.</b> Since 2025 the UCAT has three scored subtests (Verbal Reasoning, Decision Making, Quantitative Reasoning), each 300 to 900, so the <b>total is out of 2700</b>. Abstract Reasoning has been removed. The SJT is reported separately as Band 1 to 4. Scores from before 2025 were out of 3600 and can't be compared directly, so this site only uses figures on the 2700 scale.</div>
+  <div class="notice"><b>Please check before you apply.</b> Universities set interview thresholds after applications close, and they change every year. A "lowest invited" score is what the last cohort needed, not a guarantee. Where a school uses a combined points score, publishes no minimum, or hasn't released a figure on the new scale, the table says so. Always confirm on each university's own admissions page before choosing your four medicine choices on UCAS.</div>
+  <div class="controls">
+    <input type="text" id="uniSearch" placeholder="Search a university...">
+    <select id="uniRegion">
+      <option value="">All nations</option>
+      <option>England</option><option>Scotland</option><option>Wales</option><option>Northern Ireland</option>
+    </select>
+    <label class="chk"><input type="checkbox" id="uniUcatOnly"> Only show unis with a published cut-off figure</label>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>University</th><th>Nation</th><th>Lowest UCAT invited to interview</th><th>Average invited</th><th>How UCAT is used</th><th>SJT</th><th>GCSEs</th><th>A-levels</th>
+      </tr></thead>
+      <tbody id="uniBody"></tbody>
+    </table>
+  </div>
+  <p class="small">Figures are totals of the three cognitive subtests (range 900 to 2700). Unless stated, they are for UK (home) applicants who are not in a widening participation group, for 2026 entry (test sat in summer 2025). Sources: published university admissions pages as compiled by TheUKCATPeople, The Medic Portal and Dukes Plus, checked November 2026. "Check university" means I couldn't confirm a figure.</p>
+</section>
+
+<section id="leaderboard">
+  <h2>UCAT leaderboard</h2>
+  <p class="sub">Enter your total UCAT score (out of 2700) and see where you stand against last year's lowest invited-to-interview scores. Universities are ranked from highest to lowest.</p>
+  <div class="card">
+    <div class="score-box">
+      <label for="myScore"><b>Your total score:</b></label>
+      <input type="number" id="myScore" min="900" max="2700" value="2100">
+      <input type="range" id="myRange" min="1500" max="2500" value="2100">
+    </div>
+    <div class="legend">
+      <span><i style="background:var(--green)"></i>Comfortably above</span>
+      <span><i style="background:var(--amber)"></i>Above, but close</span>
+      <span><i style="background:var(--red)"></i>Below last year's lowest invited score</span>
+      <span><i style="background:#14232b"></i>Average invited score (where published)</span>
+      <span><i style="background:var(--brand)"></i>Your score</span>
+    </div>
+    <div class="board" id="board"></div>
+    <p class="small" id="boardSummary" style="margin-top:14px"></p>
+    <p class="small"><b>How the colours work:</b> bars show the lowest score invited to interview in 2026 entry. Green means you're at or above the average invited score where one is published, or 100+ points above the lowest invited score where it isn't. Amber means above the lowest invited score but not by much. Red means below it. That is a rough guide, not a prediction. Only universities with a published figure on the 2700 scale appear here. Others (for example Birmingham, Newcastle and Nottingham) rank on a combined points score instead, so check the table above.</p>
+    <p class="small">UCAT is only one part of your application. Many universities also weigh GCSEs, the SJT band, predicted grades, the personal statement and the interview.</p>
+  </div>
+</section>
+
+<section id="calculator">
+  <h2>UCAT calculator</h2>
+  <p class="sub">Two tools: add up your scaled scores, or turn raw practice marks into percentages.</p>
+  <div class="grid2">
+    <div class="card">
+      <h3 style="margin-top:0">Total score calculator</h3>
+      <p class="small">Each of the three cognitive subtests is scored from 300 to 900.</p>
+      <div class="field"><label for="vr">Verbal Reasoning</label><input type="number" id="vr" min="300" max="900" placeholder="300 to 900"></div>
+      <div class="field"><label for="dm">Decision Making</label><input type="number" id="dm" min="300" max="900" placeholder="300 to 900"></div>
+      <div class="field"><label for="qr">Quantitative Reasoning</label><input type="number" id="qr" min="300" max="900" placeholder="300 to 900"></div>
+      <div class="field"><label for="sjt">Situational Judgement band</label>
+        <select id="sjt"><option value="1">Band 1 (best)</option><option value="2">Band 2</option><option value="3">Band 3</option><option value="4">Band 4</option></select>
+      </div>
+      <button class="btn solid" id="calcBtn">Calculate</button>
+      <div class="result" id="calcResult" hidden></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Practice mark converter</h3>
+      <p class="small">Enter how many you got right out of the total in a mock section. Official scaled scores can't be worked out from raw marks, so use this as a rough progress tracker only.</p>
+      <div id="rawRows"></div>
+      <button class="btn solid" id="rawBtn">Work out percentages</button>
+      <div class="result" id="rawResult" hidden></div>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <h2>Work experience and volunteering</h2>
+  <p class="sub">Medical schools want to see that you understand what a career in healthcare involves and that you have shown care for others. Formal shadowing isn't required, and volunteering and caring roles count just as much.</p>
+  <div class="notice">Eligibility, minimum ages and availability change often. Check each provider's website before applying. Never pay anyone to guarantee you a placement at an NHS site.</div>
+  <div class="controls">
+    <input type="text" id="weSearch" placeholder="Search opportunities...">
+    <select id="weType">
+      <option value="">Online and in person</option>
+      <option value="Online">Online</option>
+      <option value="In person">In person</option>
+    </select>
+    <select id="weCost">
+      <option value="">Any cost</option>
+      <option value="Free">Free</option>
+      <option value="Paid">Paid</option>
+    </select>
+  </div>
+  <div class="wegrid" id="weGrid"></div>
+</section>
+
+<section id="chat">
+  <h2>Community chat</h2>
+  <p class="sub">Share resources, tips and questions with other applicants. Please be kind and helpful.</p>
+  <div class="notice" id="chatNotice"></div>
+  <div class="card">
+    <div class="chatbox" id="chatBox" aria-live="polite"></div>
+    <form class="chatform" id="chatForm">
+      <input type="text" id="chatName" maxlength="20" placeholder="Nickname" required>
+      <input type="text" id="chatText" maxlength="300" placeholder="Share a resource or ask a question..." required>
+      <button class="btn solid" type="submit">Send</button>
+    </form>
+    <p class="small" style="margin-bottom:0"><b>Safety rules:</b> Don't share your full name, school, address, phone number, email or social media. Messages containing contact details are blocked. Be respectful. Use "report" on anything inappropriate.</p>
+  </div>
+</section>
+
+<footer>
+  <p><b>The Med Atlas</b></p>
+  <p>The Med Atlas is an independent student resource. It is not affiliated with the UCAT Consortium, UCAS, the NHS or any university. Information is provided as a guide only and may be out of date. Always confirm entry requirements, cut-offs and deadlines with each university and at ucat.ac.uk and ucas.com.</p>
+</footer>
+
+<script>
+/* ============================================================
+   1. UNIVERSITY DATA  (EDIT THIS TO KEEP THE SITE UP TO DATE)
+   n = name, r = nation
+   c = lowest UCAT score invited to interview, 2026 entry, out of 2700
+       (null = no published figure on the new scale)
+   k = average UCAT score of those invited, 2026 entry (null if not published)
+   y = who/what the number applies to
+   m = how UCAT is used,  s = SJT,  g = GCSEs,  a = A-levels
+   x = extra note
+   ============================================================ */
+const UNIS = [
+ {n:"Aberdeen",r:"Scotland",c:1720,k:1990,y:"2026 entry, rest of UK (Scottish: 1700)",m:"Ranked with academics (UCAT about 20% of pre-interview score)",s:"Not scored",g:"Not scored (2025 entry)",a:"Predicted/achieved grades about 30% of score"},
+ {n:"Anglia Ruskin",r:"England",c:2010,k:null,y:"2026 entry, rest of UK, no uplifts",m:"All applicants ranked by UCAT, top group interviewed",s:"Band 4 rejected",g:"Minimum grades screen",a:"Predicted AAA needed",x:"Uplifts for East of England and Essex residents."},
+ {n:"Aston",r:"England",c:null,k:null,y:"",m:"Combined with GCSEs (UCAT worth 12 of 36 points)",s:"Not scored",g:"Scored (best 6 GCSEs)",a:"Only achieved A-levels are scored",x:"No figure published on the 2700 scale yet."},
+ {n:"Barts (Queen Mary)",r:"England",c:2030,k:null,y:"2026 entry, home",m:"Must be at or above the 4th decile, then ranked with UCAS tariff",s:"Band 4 rejected; Band 1 gets 2 points",g:"Not ranked",a:"UCAS tariff added to UCAT"},
+ {n:"Birmingham",r:"England",c:null,k:null,y:"",m:"Combined score: 45% GCSEs, 40% UCAT, 15% contextual. No minimum",s:"Used at interview (Band 1 gets most points)",g:"Scored (45% of score)",a:"Not ranked at shortlisting",x:"Top UCAT decile needed roughly 2220 to score full UCAT points."},
+ {n:"Brighton & Sussex",r:"England",c:1990,k:null,y:"2026 entry, home",m:"Ranks applicants; contextual applicants ranked separately",s:"Band 4 rejected",g:"Check university",a:"Check university"},
+ {n:"Bristol",r:"England",c:2240,k:null,y:"2026 entry, home (international: 2270)",m:"100% UCAT ranking once minimum grades are met",s:"Not used for shortlisting",g:"Minimum only, not weighted",a:"Minimum only, not weighted"},
+ {n:"Cambridge",r:"England",c:null,k:null,y:"",m:"UCAT used for the first time in 2025 entry",s:"Check university",g:"Check university",a:"Check university",x:"Average offer-holder scores in 2026 ranged from about 2160 to 2440 depending on college."},
+ {n:"Cardiff",r:"Wales",c:1880,k:2017,y:"2026 entry, home (Wales: 1520)",m:"Mainly a tie-breaker when many have top GCSEs",s:"Not looked at",g:"Main filter (points out of 27)",a:"Achieved A-levels give up to 3 points"},
+ {n:"Dundee",r:"Scotland",c:null,k:null,y:"",m:"Combined with academics (about 60% academic, 40% UCAT)",s:"Not considered",g:"Scored with predicted grades",a:"Predicted grades count",x:"No medicine figure published on the 2700 scale yet."},
+ {n:"Edinburgh",r:"Scotland",c:1850,k:null,y:"Published minimum for 2027 entry (1650 for 2026 entry)",m:"Hard minimum, then scored by decile (17.5% of application score)",s:"Band 4 rejected; banding scored (7.5%)",g:"Best 8 scored (7/A or above in core subjects)",a:"Academic score is 25% of total"},
+ {n:"Exeter",r:"England",c:null,k:null,y:"",m:"UCAT 25%, academics 75% of shortlisting score",s:"Check university",g:"Part of 75% academic score",a:"Part of 75% academic score",x:"No figure published on the 2700 scale yet."},
+ {n:"Glasgow",r:"Scotland",c:1990,k:null,y:"2026 entry, rest of UK (Scottish: 1870)",m:"Ranks applicants who meet screening criteria",s:"Not considered",g:"Minimum academic criteria",a:"Rest of UK needs minimum predicted AAA"},
+ {n:"Hull York",r:"England",c:null,k:null,y:"",m:"Points: up to 35 for UCAT decile, 35 GCSEs, 15 SJT, 15 contextual",s:"Band 4 rejected; up to 15 points",g:"Up to 35 points (best 6)",a:"Minimum requirements only",x:"No fixed UCAT cut-off."},
+ {n:"Imperial College London",r:"England",c:2320,k:null,y:"2026 entry, non-WP (contextual: 2170)",m:"Ranks to invite roughly the top third",s:"Band 4 rejected",g:"Check university",a:"Predicted/achieved grades considered"},
+ {n:"Keele",r:"England",c:1700,k:null,y:"Published minimum, 2026 entry, UK (international: 1950)",m:"Quintile points plus a scored personal statement (out of 25)",s:"Band 4 rejected; Band 1 gets 2 points",g:"Check university",a:"Check university",x:"Personal statement is worth 15 of 25 points."},
+ {n:"Kent & Medway",r:"England",c:null,k:null,y:"",m:"Minimum threshold set each year",s:"Band 4 rejected (Band 3+ needed in 2025)",g:"Check university",a:"Predicted A-levels not used",x:"Latest published threshold (2490) was on the old 3600 scale, so it can't be compared."},
+ {n:"King's College London",r:"England",c:null,k:null,y:"",m:"Ranked with GCSEs and widening participation indicators; no minimum",s:"Not taken into account",g:"Count towards ranking (min grade 6 in English and Maths)",a:"Checked against entry requirements, not ranked"},
+ {n:"Lancaster",r:"England",c:1920,k:null,y:"2026 entry, non-WP (WP: 1870)",m:"Ranks all applicants who meet entry requirements",s:"Check university",g:"Check university",a:"Check university"},
+ {n:"Leeds",r:"England",c:null,k:null,y:"",m:"Combined with academics; no pre-set cut-off",s:"Check university",g:"Scored with UCAT",a:"Predicted/achieved assessed",x:"No figure published on the 2700 scale yet."},
+ {n:"Leicester",r:"England",c:1820,k:2051,y:"2026 entry, home",m:"50% of pre-interview score; bottom two deciles not considered",s:"Band 4 rejected",g:"50% of pre-interview score (8 GCSEs)",a:"Bonus points for extra A* if achieved"},
+ {n:"Lincoln",r:"England",c:null,k:null,y:"",m:"Combined with GCSEs (15 points UCAT, 15 points SJT)",s:"Band 4 rejected; up to 15 points",g:"Up to 30 points (best 6)",a:"Check university"},
+ {n:"Liverpool",r:"England",c:1960,k:null,y:"2026 entry, home (international: 2080)",m:"Ranks applicants, then checks minimum academics",s:"Band 4 rejected for home applicants",g:"Minimum 15 points from best 9",a:"Check university"},
+ {n:"Manchester",r:"England",c:2060,k:2193,y:"2026 entry, non-WP (WP: 1960)",m:"Threshold set each year (top four deciles)",s:"Band 1 or 2 preferred; Band 3/4 likely rejected",g:"Minimum requirements",a:"Minimum predicted grades required"},
+ {n:"Newcastle",r:"England",c:null,k:null,y:"",m:"Points out of 100: up to 60 UCAT, 40 GCSEs",s:"Band 4 rejected; used in interview scoring",g:"Up to 40 points (best 8)",a:"AAA; achieved A-levels can replace GCSE score",x:"Selection uses combined points, not a single UCAT figure."},
+ {n:"Norwich (UEA)",r:"England",c:null,k:null,y:"",m:"No cut-off; ranks for interview and again for offers",s:"Included in interview score",g:"Check university",a:"Check university"},
+ {n:"Nottingham",r:"England",c:null,k:null,y:"",m:"Points out of 82: UCAT 50 (Verbal Reasoning double), GCSEs 32",s:"Band 4 rejected; up to 10 points",g:"Up to 32 points (8 GCSEs)",a:"Predicted A-levels not scored"},
+ {n:"Oxford",r:"England",c:null,k:null,y:"",m:"Combined UCAT and GCSE score for shortlisting",s:"Check university",g:"Part of shortlisting score",a:"Check university",x:"Average invited score 2026: about 2378 (home). Average offer: about 2407."},
+ {n:"Plymouth",r:"England",c:null,k:null,y:"",m:"Holistic with GCSEs and A-levels",s:"Not used (2023 entry)",g:"Part of holistic score",a:"Part of holistic score",x:"No figure published on the 2700 scale yet."},
+ {n:"Queen's Belfast",r:"Northern Ireland",c:null,k:null,y:"",m:"UCAT worth 9 of 45 points (20%), GCSEs 36 points",s:"Only for borderline applicants",g:"Up to 36 points (best 9)",a:"Achieved grades meeting requirements"},
+ {n:"Sheffield",r:"England",c:2120,k:null,y:"2026 entry, home (published minimum 1800)",m:"Must pass minimum, then ranked by UCAT",s:"Counted as a ninth interview station (up to 5 points)",g:"Minimum academic requirement",a:"No compensation between grades and UCAT"},
+ {n:"Southampton",r:"England",c:null,k:null,y:"",m:"Ranks for Selection Day invitation",s:"Not used",g:"Check university",a:"Check university",x:"Latest figure (2760) was on the old 3600 scale, so it can't be compared."},
+ {n:"St Andrews",r:"Scotland",c:null,k:null,y:"",m:"Ranked by UCAT, roughly top 500 interviewed",s:"Check university",g:"Minimum requirements",a:"Minimum requirements",x:"Widening participation applicants get a 10% uplift."},
+ {n:"St George's, London",r:"England",c:1880,k:null,y:"2026 entry, home non-WP (international: 1640)",m:"Min 500 per section, then ranked by total",s:"Considered from 2027 entry",g:"Check university",a:"Check university"},
+ {n:"Sunderland",r:"England",c:null,k:null,y:"",m:"Must be in the top eight deciles, plus work experience form",s:"Band 4 rejected",g:"Check university",a:"Predicted grades not looked at"},
+ {n:"UCL",r:"England",c:2190,k:null,y:"2026 entry, home (Access UCL: 2080)",m:"Total UCAT ranks and selects for interview",s:"Used to separate equal scores",g:"Not scored",a:"Minimum grades only"}
+];
+
+/* ============================================================
+   2. WORK EXPERIENCE DATA (add more by copying a line)
+   ============================================================ */
+const WE = [
+ {t:"Observe GP",type:"Online",cost:"Free",d:"Free online platform with videos of real GP consultations and reflective questions. Popular for personal statements and interviews.",l:"https://www.observegp.com"},
+ {t:"NHS volunteering (local trust)",type:"In person",cost:"Free",d:"Most NHS hospital trusts run volunteer programmes (ward helpers, befrienders, wayfinders). Search for your nearest trust's volunteering page. Minimum ages vary, often 16+ or 18+.",l:"https://www.nhs.uk/nhs-services/hospitals/volunteering-in-hospitals/"},
+ {t:"St John Ambulance",type:"In person",cost:"Free",d:"Youth and adult volunteering with first aid training and event cover across the UK.",l:"https://www.sja.org.uk"},
+ {t:"British Red Cross",type:"In person",cost:"Free",d:"Volunteer roles in first aid, community support and shops across the UK. Good evidence of commitment and teamwork.",l:"https://www.redcross.org.uk"},
+ {t:"Hospice volunteering",type:"In person",cost:"Free",d:"Hospices welcome volunteers in many roles. Great for showing empathy and understanding of palliative care. Contact your local hospice.",l:"https://www.hospiceuk.org"},
+ {t:"Care home volunteering",type:"In person",cost:"Free",d:"Visit and support residents with activities and conversation. Contact local care homes directly. Often counts strongly for empathy.",l:"https://www.nhs.uk/conditions/social-care-and-support-guide/"},
+ {t:"GP surgery or pharmacy shadowing",type:"In person",cost:"Free",d:"Ask local surgeries, pharmacies, dentists and opticians directly with a polite email or visit. Availability varies and many only accept short observation days.",l:"https://www.nhs.uk/service-search/find-a-gp"},
+ {t:"Sutton Trust Pathways to Medicine",type:"In person",cost:"Free",d:"Programme for eligible state school students, with support, university experiences and work experience. Check eligibility and application windows.",l:"https://www.suttontrust.com/our-work/pathways-to-professions/"},
+ {t:"Medical school outreach and widening participation events",type:"In person",cost:"Free",d:"Many medical schools run open days, taster days and summer schools for Year 12 students. Search the outreach page of each medical school you are interested in.",l:"https://www.medschools.ac.uk"},
+ {t:"Medical Schools Council guidance",type:"Online",cost:"Free",d:"Official advice about what medical schools expect from work experience and how to reflect on it.",l:"https://www.medschools.ac.uk"},
+ {t:"FutureLearn healthcare courses",type:"Online",cost:"Free",d:"Free short online courses from universities on topics like healthcare, anatomy and medical ethics. Useful for your personal statement and interviews.",l:"https://www.futurelearn.com"},
+ {t:"The Medic Portal resources",type:"Online",cost:"Free",d:"Free guides, webinars and advice on work experience, applications and interviews. Some courses are paid.",l:"https://www.themedicportal.com"},
+ {t:"Young carer or caring role",type:"In person",cost:"Free",d:"Looking after a family member or neighbour can be strong evidence of care and responsibility. You can reflect on this in your application.",l:"https://www.nhs.uk/conditions/social-care-and-support-guide/support-and-benefits-for-carers/"}
+];
+
+/* ============================================================
+   3. UNIVERSITY TABLE
+   ============================================================ */
+const uniBody = document.getElementById('uniBody');
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function cellText(v){
+  return v==='Check university' ? '<span class="tag chk">Check university</span>' : esc(v);
+}
+function renderUnis(){
+  const q = document.getElementById('uniSearch').value.toLowerCase();
+  const reg = document.getElementById('uniRegion').value;
+  const only = document.getElementById('uniUcatOnly').checked;
+  uniBody.innerHTML = UNIS.filter(u =>
+    u.n.toLowerCase().includes(q) && (!reg || u.r===reg) && (!only || u.c)
+  ).map(u => `<tr>
+    <td><b>${esc(u.n)}</b>${u.x?`<span class="mini">${esc(u.x)}</span>`:''}</td>
+    <td>${esc(u.r)}</td>
+    <td>${u.c ? `<span class="num">${u.c}</span><span class="mini">${esc(u.y)}</span>` : '<span class="tag chk">No figure on 2700 scale</span>'}</td>
+    <td>${u.k ? `<span class="num">${u.k}</span>` : '<span class="mini">Not published</span>'}</td>
+    <td>${esc(u.m)}</td>
+    <td>${cellText(u.s)}</td>
+    <td>${cellText(u.g)}</td>
+    <td>${cellText(u.a)}</td>
+  </tr>`).join('') || '<tr><td colspan="8">No universities match.</td></tr>';
+}
+['uniSearch','uniRegion','uniUcatOnly'].forEach(id=>document.getElementById(id).addEventListener('input',renderUnis));
+renderUnis();
+
+/* ============================================================
+   4. LEADERBOARD BAR GRAPH (scores out of 2700)
+   ============================================================ */
+const MIN = 1500, MAX = 2500;
+const board = document.getElementById('board');
+const myScore = document.getElementById('myScore');
+const myRange = document.getElementById('myRange');
+function pct(v){ return Math.max(0, Math.min(100, (v-MIN)/(MAX-MIN)*100)); }
+function renderBoard(){
+  const score = Number(myScore.value) || 0;
+  const list = UNIS.filter(u=>u.c).sort((a,b)=>b.c-a.c);
+  let green=0, above=0;
+  board.innerHTML = list.map((u,i)=>{
+    const comfortable = u.k ? u.k : u.c + 100;
+    let colour='var(--red)';
+    if(score>=comfortable){colour='var(--green)';green++;above++;}
+    else if(score>=u.c){colour='var(--amber)';above++;}
+    return `<div class="row">
+      <div class="rank">${i+1}</div>
+      <div class="name" title="${esc(u.n)}">${esc(u.n)}</div>
+      <div class="track">
+        <div class="bar" style="width:${pct(u.c)}%;background:${colour}"></div>
+        ${u.k?`<div class="comp" style="left:${pct(u.k)}%" title="Average invited ${u.k}"></div>`:''}
+        <div class="me" style="left:${pct(score)}%"></div>
+      </div>
+      <div class="val">${u.c}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('boardSummary').textContent =
+    `With ${score}, you are at or above last year's lowest invited score at ${above} of ${list.length} universities shown, and comfortably above it at ${green}.`;
+}
+myScore.addEventListener('input',()=>{myRange.value=myScore.value;renderBoard();});
+myRange.addEventListener('input',()=>{myScore.value=myRange.value;renderBoard();});
+renderBoard();
+
+/* ============================================================
+   5. UCAT CALCULATOR
+   2026 national benchmarks (out of 2700): average 1918,
+   median about 1920, top decile from 2250.
+   ============================================================ */
+document.getElementById('calcBtn').addEventListener('click',()=>{
+  const ids=['vr','dm','qr'];
+  const vals=ids.map(id=>Number(document.getElementById(id).value));
+  const out=document.getElementById('calcResult');
+  out.hidden=false;
+  if(vals.some(v=>!v || v<300 || v>900)){
+    out.innerHTML='<b>Please enter all three scores between 300 and 900.</b>';
+    return;
+  }
+  const total=vals.reduce((a,b)=>a+b,0);
+  const avg=Math.round(total/3);
+  const band=document.getElementById('sjt').value;
+  const withFigure=UNIS.filter(u=>u.c);
+  const ok=withFigure.filter(u=>total>=u.c).length;
+  let where;
+  if(total>=2250) where='in the top 10% nationally (2026 figures)';
+  else if(total>=1920) where='above the national median (2026 figures)';
+  else if(total>=1918) where='around the national average (2026 figures)';
+  else where='below the national average of 1918 (2026 figures)';
+  out.innerHTML=`<div class="big">${total}</div>
+    <div>Total (out of 2700) &middot; Average per section: <b>${avg}</b> &middot; SJT: <b>Band ${band}</b></div>
+    <p class="small">Your score is ${where}. You are at or above last year's lowest invited score at ${ok} of ${withFigure.length} universities with a published figure.${band==='4'?' Many universities automatically reject SJT Band 4, so check the table before choosing.':''}</p>
+    <button class="btn solid" id="useScore">Show me on the leaderboard</button>`;
+  document.getElementById('useScore').addEventListener('click',()=>{
+    myScore.value=total; myRange.value=Math.max(1500,Math.min(2500,total)); renderBoard();
+    document.getElementById('leaderboard').scrollIntoView();
+  });
+});
+
+const RAW=[['Verbal Reasoning',44],['Decision Making',35],['Quantitative Reasoning',36],['Situational Judgement',69]];
+document.getElementById('rawRows').innerHTML=RAW.map((r,i)=>
+ `<div class="field"><label for="raw${i}">${r[0]} (out of ${r[1]})</label><input type="number" id="raw${i}" min="0" max="${r[1]}" placeholder="Marks correct"></div>`).join('');
+document.getElementById('rawBtn').addEventListener('click',()=>{
+  const out=document.getElementById('rawResult'); out.hidden=false;
+  let html='';
+  RAW.forEach((r,i)=>{
+    const v=document.getElementById('raw'+i).value;
+    if(v==='') return;
+    const n=Math.max(0,Math.min(r[1],Number(v)));
+    html+=`<div>${r[0]}: <b>${Math.round(n/r[1]*100)}%</b> (${n}/${r[1]})</div>`;
+  });
+  out.innerHTML = html || 'Enter at least one section.';
+});
+
+/* ============================================================
+   6. WORK EXPERIENCE LIST
+   ============================================================ */
+function renderWE(){
+  const q=document.getElementById('weSearch').value.toLowerCase();
+  const type=document.getElementById('weType').value;
+  const cost=document.getElementById('weCost').value;
+  const list=WE.filter(w=>(w.t+' '+w.d).toLowerCase().includes(q) && (!type||w.type===type) && (!cost||w.cost===cost));
+  document.getElementById('weGrid').innerHTML=list.map(w=>`<div class="card we">
+    <span class="tag">${esc(w.type)}</span> <span class="tag">${esc(w.cost)}</span>
+    <h3>${esc(w.t)}</h3>
+    <p>${esc(w.d)}</p>
+    <p><a href="${esc(w.l)}" target="_blank" rel="noopener noreferrer">Visit website &rarr;</a></p>
+  </div>`).join('') || '<p>No opportunities match.</p>';
+}
+['weSearch','weType','weCost'].forEach(id=>document.getElementById(id).addEventListener('input',renderWE));
+renderWE();
+
+/* ============================================================
+   7. PUBLIC CHAT
+   GitHub Pages can't store messages by itself, so this uses
+   Firebase Realtime Database (free). Until you paste your
+   Firebase details below, the chat runs in "demo mode" where
+   messages are only saved in your own browser.
+
+   SETUP (5 minutes):
+   1. Go to https://console.firebase.google.com and create a project.
+   2. Build > Realtime Database > Create database.
+   3. Project settings > Your apps > Web (</>) and copy the config.
+   4. Paste it into FIREBASE_CONFIG below.
+   5. In Realtime Database > Rules, use rules that allow reading and
+      adding messages only, for example:
+      { "rules": { "messages": { ".read": true,
+        "$id": { ".write": "!data.exists()",
+        ".validate": "newData.child('text').isString() && newData.child('text').val().length <= 300" } } } }
+   ============================================================ */
+const FIREBASE_CONFIG = {
+  apiKey: "",
+  authDomain: "",
+  databaseURL: "",
+  projectId: "",
+  appId: ""
+};
+
+const chatBox=document.getElementById('chatBox');
+const chatNotice=document.getElementById('chatNotice');
+const useFirebase = !!FIREBASE_CONFIG.databaseURL;
+let db=null;
+
+const BLOCK = [/[\w.+-]+@[\w-]+\.[\w.]+/i, /(\+?\d[\s-]?){9,}/, /\b(instagram|snapchat|tiktok|whatsapp|discord)\b/i];
+const BAD = ['fuck','shit','cunt','bitch','nigg','faggot','retard'];
+
+function clean(text){
+  if(BLOCK.some(r=>r.test(text))) return 'Messages can\'t include emails, phone numbers or social media for safety reasons.';
+  if(BAD.some(w=>text.toLowerCase().includes(w))) return 'Please keep the chat respectful.';
+  return null;
+}
+function linkify(text){
+  return esc(text).replace(/(https?:\/\/[^\s<]+)/g,u=>`<a href="${u}" target="_blank" rel="noopener noreferrer nofollow">${u}</a>`);
+}
+function addMsg(m,key){
+  const d=document.createElement('div'); d.className='msg';
+  const t=new Date(m.time||Date.now());
+  d.innerHTML=`<b>${esc(m.name)}</b><time>${t.toLocaleString([], {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</time>
+    <button type="button">report</button><br>${linkify(m.text)}`;
+  d.querySelector('button').addEventListener('click',e=>{
+    e.target.textContent='reported'; e.target.disabled=true;
+    if(db && key) db.ref('reports/'+key).set(true);
+  });
+  chatBox.appendChild(d);
+  chatBox.scrollTop=chatBox.scrollHeight;
+}
+
+if(useFirebase){
+  chatNotice.textContent='Live chat. Messages are public and visible to everyone using the site.';
+  const s1=document.createElement('script');
+  s1.src='https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js';
+  s1.onload=()=>{
+    const s2=document.createElement('script');
+    s2.src='https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js';
+    s2.onload=()=>{
+      firebase.initializeApp(FIREBASE_CONFIG);
+      db=firebase.database();
+      db.ref('messages').limitToLast(100).on('child_added',snap=>addMsg(snap.val(),snap.key));
+    };
+    document.head.appendChild(s2);
+  };
+  document.head.appendChild(s1);
+}else{
+  chatNotice.innerHTML='<b>Demo mode:</b> the chat isn\'t connected to a shared database yet, so messages are only saved in your own browser. See the setup steps in the code (section 7) to make it a real public chat.';
+  JSON.parse(localStorage.getItem('medatlas_chat')||'[]').forEach(m=>addMsg(m));
+}
+
+const savedName=localStorage.getItem('medatlas_name');
+if(savedName) document.getElementById('chatName').value=savedName;
+let lastSent=0;
+document.getElementById('chatForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const name=document.getElementById('chatName').value.trim().slice(0,20);
+  const text=document.getElementById('chatText').value.trim().slice(0,300);
+  if(!name||!text) return;
+  if(Date.now()-lastSent<3000){alert('Please wait a few seconds between messages.');return;}
+  const problem=clean(name+' '+text);
+  if(problem){alert(problem);return;}
+  lastSent=Date.now();
+  localStorage.setItem('medatlas_name',name);
+  const m={name,text,time:Date.now()};
+  if(useFirebase && db){ db.ref('messages').push(m); }
+  else{
+    addMsg(m);
+    const arr=JSON.parse(localStorage.getItem('medatlas_chat')||'[]'); arr.push(m);
+    localStorage.setItem('medatlas_chat',JSON.stringify(arr.slice(-100)));
+  }
+  document.getElementById('chatText').value='';
+});
+</script>
+</body>
+</html>
